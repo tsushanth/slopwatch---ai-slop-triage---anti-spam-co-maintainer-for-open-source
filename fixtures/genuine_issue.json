@@ -1,0 +1,5 @@
+{
+  "type": "issue",
+  "title": "Crash on startup when config.yaml is missing optional 'cache' key",
+  "body": "Steps to reproduce:\n1. Remove the `cache:` key from config.yaml\n2. Run `myapp --config config.yaml`\n3. Observe the traceback below\n\nTraceback (most recent call last):\n  File \"myapp/config.py\", line 42, in load_config\n    cache_ttl = config['cache']['ttl']\nKeyError: 'cache'\n\nExpected: cache should default to disabled when the key is absent, per docs/config.md. Happens on v2.3.1, Python 3.11, macOS 14."
+}

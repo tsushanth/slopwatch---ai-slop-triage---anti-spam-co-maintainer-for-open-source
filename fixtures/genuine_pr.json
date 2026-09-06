@@ -1,0 +1,6 @@
+{
+  "type": "pr",
+  "title": "Fix KeyError when 'cache' key is missing from config.yaml",
+  "body": "Fixes #482.\n\n`load_config` in myapp/config.py assumed `config['cache']` always exists. This makes it optional and defaults to a disabled cache when absent, matching the documented behavior in docs/config.md.\n\nAdded a regression test in tests/test_config.py that loads a config file without the cache key.",
+  "diff": "diff --git a/myapp/config.py b/myapp/config.py\nindex 1234567..89abcde 100644\n--- a/myapp/config.py\n+++ b/myapp/config.py\n@@ -39,7 +39,7 @@ def load_config(path):\n     config = yaml.safe_load(open(path))\n-    cache_ttl = config['cache']['ttl']\n+    cache_cfg = config.get('cache', {'enabled': False})\n+    cache_ttl = cache_cfg.get('ttl', 0)\n     return Config(cache_ttl=cache_ttl)\ndiff --git a/tests/test_config.py b/tests/test_config.py\nindex 2345678..9abcdef 100644\n--- a/tests/test_config.py\n+++ b/tests/test_config.py\n@@ -10,6 +10,12 @@ def test_load_config_with_cache():\n     config = load_config('fixtures/with_cache.yaml')\n     assert config.cache_ttl == 300\n+\n+def test_load_config_without_cache_key():\n+    config = load_config('fixtures/no_cache.yaml')\n+    assert config.cache_ttl == 0\n"
+}
